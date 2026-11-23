@@ -2,7 +2,7 @@
 
 A touch screen for [Dear ImGui](https://github.com/ocornut/imgui), as on a phone: an app made for the mouse works with a finger. With no change to its widgets.
 
-**Try it online, on a phone:** [the touch demo](https://pthom.github.io/imgui_touch/).
+**Try it online, on a phone:** [the touch demo](https://pthom.github.io/imgui_touch/). With its code beside it, in C++ or Python: [the interactive explorer](https://pthom.github.io/imgui_explorer/?lib=imguitouch).
 
 *Status: early (0.1). The API may still change. It comes from [imgui_kit](https://github.com/pthom/imgui_kit), which keeps the layout helpers and the widgets.*
 

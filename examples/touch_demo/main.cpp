@@ -102,9 +102,9 @@ int main(int, char**)
         ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, viewport->WorkSize.y - keyboard.Top - keyboard.Bottom));
         ImGui::Begin("imgui_touch touch demo", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings);
         ImGui::TextWrapped("Try it with a finger. On a desktop: tick \"Simulate touch\", and the mouse plays a finger.");
-        const char* code_url = "https://github.com/pthom/imgui_touch";
-        ImGui::TextLinkOpenURL("The code, on GitHub", code_url);
-        ImGuiTouch::SetItemOpensUrl(code_url);  // imgui_touch: a new tab, in every browser
+        const char* explorer_url = "https://pthom.github.io/imgui_explorer/?lib=imguitouch";
+        ImGui::TextLinkOpenURL("This demo with its code, in the interactive explorer", explorer_url);
+        ImGuiTouch::SetItemOpensUrl(explorer_url);  // imgui_touch: a new tab, in every browser
         ImGuiTouch::ShowDemoContents();
         ImGui::End();
 

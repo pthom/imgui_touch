@@ -105,7 +105,8 @@
                                     io.DisplaySize.y - (float)safe.top - bottom));
     ImGui::Begin("imgui_touch touch demo", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings);
     ImGui::TextWrapped("Try it with a finger.");
-    ImGui::TextLinkOpenURL("The code, on GitHub", "https://github.com/pthom/imgui_touch");
+    ImGui::TextLinkOpenURL("This demo with its code, in the interactive explorer",
+                           "https://pthom.github.io/imgui_explorer/?lib=imguitouch");
     ImGuiTouch::ShowDemoContents();
     ImGui::End();
 
