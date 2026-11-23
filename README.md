@@ -32,6 +32,8 @@ target_link_libraries(my_app PRIVATE imgui_touch)
 
 Without an `imgui` target, the CMake uses a Dear ImGui package (`find_package(imgui)`: Conan, vcpkg), builds one from `IMGUI_TOUCH_IMGUI_DIR`, or fetches Dear ImGui (`IMGUI_TOUCH_FETCH_IMGUI_TAG`). Installed (`cmake --install`, with `IMGUI_TOUCH_INSTALL`), it is a package: `find_package(imgui_touch)`, then link `imgui_touch::imgui_touch`.
 
+For AI assistants: [llms.txt](llms.txt) (also at https://pthom.github.io/imgui_touch/llms.txt): how to set it up, and its traps.
+
 ## Touch screens
 
 One call after `ImGui::CreateContext()`, and each frame goes through it (Dear ImGui's context hooks): nothing to call per frame.
