@@ -1,13 +1,13 @@
-// imgui_kit's touch demo: Dear ImGui's GLFW + OpenGL3 example, plus the kit's touch layer and wheel session.
+// imgui_touch's touch demo: Dear ImGui's GLFW + OpenGL3 example, plus the touch layer.
 // It builds for the desktop and for the web (Emscripten): open it on a phone to try the gestures.
-// https://github.com/pthom/imgui_kit (MIT license)
+// https://github.com/pthom/imgui_touch (MIT license)
 //
-// What the kit adds to Dear ImGui's example: the lines marked "imgui_kit".
+// What imgui_touch adds to Dear ImGui's example: the lines marked "imgui_touch".
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "imgui_kit.h"
+#include "imgui_touch.h"
 #include <stdio.h>
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -50,7 +50,7 @@ int main(int, char**)
 
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());
     GLFWwindow* window =
-        glfwCreateWindow((int)(600 * main_scale), (int)(800 * main_scale), "imgui_kit touch demo", nullptr, nullptr);
+        glfwCreateWindow((int)(600 * main_scale), (int)(800 * main_scale), "imgui_touch touch demo", nullptr, nullptr);
     if (window == nullptr)
         return 1;
     glfwMakeContextCurrent(window);
@@ -71,11 +71,10 @@ int main(int, char**)
 #endif
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    ImGuiTouch::Setup();            // imgui_kit: the touch layer (swipe, long press, pinch)
-    ImGuiKit::SetupWheelSession();  // imgui_kit: the wheel stays with the window it scrolls
+    ImGuiTouch::Setup();            // imgui_touch: the touch layer (swipe, long press, pinch)
 #ifdef __EMSCRIPTEN__
-    ImGuiTouch::SetupEmscripten();  // imgui_kit: in a browser, which pointer is a finger, and the fingers
-    ImGuiTouch::SetupEmscriptenKeyboard();  // imgui_kit: the phone's keyboard, for the text fields
+    ImGuiTouch::SetupEmscripten();  // imgui_touch: in a browser, which pointer is a finger, and the fingers
+    ImGuiTouch::SetupEmscriptenKeyboard();  // imgui_touch: the phone's keyboard, for the text fields
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -96,18 +95,18 @@ int main(int, char**)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // The kit's demo, in a window that fills the screen (a phone's page), out of the phone's keyboard
+        // The touch layer's demo, in a window that fills the screen (a phone's page), out of the phone's keyboard
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImGuiTouchKeyboardInsets keyboard = ImGuiTouch::GetKeyboardInsets();  // imgui_kit
+        ImGuiTouchKeyboardInsets keyboard = ImGuiTouch::GetKeyboardInsets();  // imgui_touch
         ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y + keyboard.Top));
         ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, viewport->WorkSize.y - keyboard.Top - keyboard.Bottom));
-        ImGui::Begin("imgui_kit touch demo", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Begin("imgui_touch touch demo", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings);
         ImGui::TextWrapped("Open \"Touch\" below, then try it with a finger. On a desktop: tick \"Simulate a touch "
                            "source\", and the mouse plays a finger.");
         const char* explorer_url = "https://pthom.github.io/imgui_explorer/?lib=imguikit";
         ImGui::TextLinkOpenURL("See the full interactive explorer", explorer_url);
-        ImGuiTouch::SetItemOpensUrl(explorer_url);  // imgui_kit: a new tab, in every browser
-        ImGuiKit::ShowDemoContents();
+        ImGuiTouch::SetItemOpensUrl(explorer_url);  // imgui_touch: a new tab, in every browser
+        ImGuiTouch::ShowDemoContents();
         ImGui::End();
 
         ImGui::Render();

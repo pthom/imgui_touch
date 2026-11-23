@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-EMBEDS = [("imgui_kit_emscripten_keyboard.cpp", "imgui_kit_emscripten_keyboard.js")]
+EMBEDS = [("imgui_touch_emscripten_keyboard.cpp", "imgui_touch_emscripten_keyboard.js")]
 MARKER = re.compile(r'^( *)// <embedded file="([^"]+)" sha1="([0-9a-f]*)">.*\n(.*?)^ *// </embedded>', re.M | re.S)
 
 

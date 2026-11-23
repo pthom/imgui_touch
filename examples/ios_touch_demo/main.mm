@@ -1,7 +1,7 @@
-// imgui_kit's touch demo on iOS: Dear ImGui's Apple Metal example (its iOS part), plus the kit's touch layer.
-// https://github.com/pthom/imgui_kit (MIT license)
+// imgui_touch's touch demo on iOS: Dear ImGui's Apple Metal example (its iOS part), plus the touch layer.
+// https://github.com/pthom/imgui_touch (MIT license)
 //
-// What the kit adds to Dear ImGui's example: the lines marked "imgui_kit". The rest is what any iOS app needs:
+// What imgui_touch adds to Dear ImGui's example: the lines marked "imgui_touch". The rest is what any iOS app needs:
 // all the fingers reported (multipleTouchEnabled), the safe area (the notch), the keyboard (UIKeyInput).
 
 #import <UIKit/UIKit.h>
@@ -10,7 +10,7 @@
 
 #include "imgui.h"
 #include "imgui_impl_metal.h"
-#include "imgui_kit.h"
+#include "imgui_touch.h"
 #include <float.h>
 
 @interface AppViewController : UIViewController <MTKViewDelegate, UIKeyInput>
@@ -36,8 +36,7 @@
     ImGui::GetStyle().FontSizeBase = 17.0f;  // iOS's body text size, in points
     ImGui_ImplMetal_Init(_device);
 
-    ImGuiTouch::Setup();            // imgui_kit: the touch layer (swipe, long press, pinch)
-    ImGuiKit::SetupWheelSession();  // imgui_kit: the wheel (a trackpad or a mouse on an iPad)
+    ImGuiTouch::Setup();            // imgui_touch: the touch layer (swipe, long press, pinch)
 
     // Dear ImGui's links (TextLinkOpenURL) open in Safari
     ImGui::GetPlatformIO().Platform_OpenInShellFn = [](ImGuiContext*, const char* url) {
@@ -73,12 +72,12 @@
     CGRect frame = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGRect inView = [self.view convertRect:frame fromView:nil];
     float hidden = (float)MAX(0.0, CGRectGetMaxY(self.view.bounds) - CGRectGetMinY(inView));
-    ImGuiTouch::SetKeyboardInsets(ImGuiTouchKeyboardInsets{0.0f, hidden});  // imgui_kit: the caret stays above it
+    ImGuiTouch::SetKeyboardInsets(ImGuiTouchKeyboardInsets{0.0f, hidden});  // imgui_touch: the caret stays above it
 }
 
 -(void)keyboardWillHide:(NSNotification*)notification
 {
-    ImGuiTouch::SetKeyboardInsets(ImGuiTouchKeyboardInsets{});  // imgui_kit
+    ImGuiTouch::SetKeyboardInsets(ImGuiTouchKeyboardInsets{});  // imgui_touch
 }
 
 -(void)drawInMTKView:(MTKView*)view
@@ -98,16 +97,16 @@
     ImGui_ImplMetal_NewFrame(renderPassDescriptor);
     ImGui::NewFrame();
 
-    // The kit's demo, in a window that fills the screen, out of the notch and the keyboard
+    // The touch layer's demo, in a window that fills the screen, out of the notch and the keyboard
     UIEdgeInsets safe = view.safeAreaInsets;
-    float bottom = MAX((float)safe.bottom, ImGuiTouch::GetKeyboardInsets().Bottom);  // imgui_kit
+    float bottom = MAX((float)safe.bottom, ImGuiTouch::GetKeyboardInsets().Bottom);  // imgui_touch
     ImGui::SetNextWindowPos(ImVec2((float)safe.left, (float)safe.top));
     ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x - (float)(safe.left + safe.right),
                                     io.DisplaySize.y - (float)safe.top - bottom));
-    ImGui::Begin("imgui_kit touch demo", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings);
+    ImGui::Begin("imgui_touch touch demo", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings);
     ImGui::TextWrapped("Open \"Touch\" below, then try it with a finger.");
     ImGui::TextLinkOpenURL("See the full interactive explorer", "https://pthom.github.io/imgui_explorer/?lib=imguikit");
-    ImGuiKit::ShowDemoContents();
+    ImGuiTouch::ShowDemoContents();
     ImGui::End();
 
     ImGui::Render();
@@ -129,7 +128,7 @@
 {
 }
 
-// The fingers: each one goes to the kit (the pinch, two fingers dragged together); the first one is also Dear
+// The fingers: each one goes to the touch layer (the pinch, two fingers dragged together); the first one is also Dear
 // ImGui's mouse. Between two touches there is no pointer (nothing stays hovered).
 -(void)updateTouches:(UIEvent*)event
 {
@@ -143,7 +142,7 @@
                               : touch.phase == UITouchPhaseEnded ? ImGuiTouchPhase_Ended
                               : touch.phase == UITouchPhaseCancelled ? ImGuiTouchPhase_Cancelled
                               : ImGuiTouchPhase_Moved;  // moved, stationary
-        ImGuiTouch::AddFingerEvent(id, ImVec2((float)p.x, (float)p.y), phase);  // imgui_kit
+        ImGuiTouch::AddFingerEvent(id, ImVec2((float)p.x, (float)p.y), phase);  // imgui_touch
 
         if (self.mouseTouch == nil && down)
             self.mouseTouch = touch;

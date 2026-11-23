@@ -1,9 +1,9 @@
-// imgui_kit's Test Engine tests, headless: Dear ImGui's null backend, at full speed. Exits with 0 when all passed.
-// Usage: imgui_kit_te_tests [filter]   (a test's name or group, e.g. "touch"; all by default)
+// imgui_touch's Test Engine tests, headless: Dear ImGui's null backend, at full speed. Exits with 0 when all passed.
+// Usage: imgui_touch_te_tests [filter]   (a test's name or group, e.g. "touch"; all by default)
 #include "imgui.h"
 #include "imgui_impl_null.h"
 #include "imgui_te_engine.h"
-#include "kit_te_tests.h"
+#include "touch_te_tests.h"
 #include <stdio.h>
 
 int main(int argc, char** argv)
@@ -20,12 +20,12 @@ int main(int argc, char** argv)
     test_io.ConfigLogToTTY = true;
     test_io.ConfigVerboseLevel = ImGuiTestVerboseLevel_Info;
     test_io.ConfigVerboseLevelOnError = ImGuiTestVerboseLevel_Debug;
-    // The kit's hooks before the engine's: the engine runs each test's GUI from its own NewFramePost hook,
-    // which must come after the touch layer and the wheel session
-    KitTestsSetup();
+    // The layer's hooks before the engine's: the engine runs each test's GUI from its own NewFramePost hook,
+    // which must come after the touch layer
+    TouchTestsSetup();
     ImGuiTestEngine_Start(engine, ImGui::GetCurrentContext());
 
-    KitTestsRegister(engine);
+    TouchTestsRegister(engine);
     ImGuiTestEngine_QueueTests(engine, ImGuiTestGroup_Tests, argc > 1 ? argv[1] : nullptr,
                                ImGuiTestRunFlags_RunFromCommandLine);
     while (!ImGuiTestEngine_IsTestQueueEmpty(engine))
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
     ImGuiTestEngine_Stop(engine);
     ImGuiTestEngineResultSummary summary;
     ImGuiTestEngine_GetResultSummary(engine, &summary);
-    printf("imgui_kit_te_tests: %d of %d passed\n", summary.CountSuccess, summary.CountTested);
+    printf("imgui_touch_te_tests: %d of %d passed\n", summary.CountSuccess, summary.CountTested);
     ImGui_ImplNull_Shutdown();
     ImGui::DestroyContext();
     ImGuiTestEngine_DestroyContext(engine);

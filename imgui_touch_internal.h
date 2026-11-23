@@ -1,17 +1,18 @@
-// imgui_kit: the touch layer's internals (ImGuiTouch: the swipe, the pinch, the keyboard, the browser)
-// https://github.com/pthom/imgui_kit (MIT license)
+// imgui_touch: the touch layer's internals (ImGuiTouch: the swipe, the pinch, the keyboard, the browser)
+// https://github.com/pthom/imgui_touch (MIT license)
 // How this could fit in Dear ImGui: docs/dear_imgui_integration.md
 //
 // As Dear ImGui's imgui_internal.h: no guarantee of forward compatibility here. Code that includes it may need changes
-// at a new version of the kit.
+// at a new version of imgui_touch.
 //
 // The layer's state, ImGuiTouchContext: one per Dear ImGui context, as Dear ImGui's own state is in ImGuiContext. Dear
-// ImGui has no slot for an extension's state: the kit keeps it in its own per-context state (ImGuiKitContext, see
-// imgui_kit_internal.h). Only imgui_kit_touch.cpp knows that: the layer's other sources reach the state through
+// ImGui has no slot for an extension's state: the layer stores it in the UserData of a context hook it adds
+// (ImGui::AddContextHook, of type Shutdown), as the Test Engine stores its own. ImGui::DestroyContext() calls that hook,
+// which frees the state. Only imgui_touch.cpp knows that: the layer's other sources reach the state through
 // ImGuiTouch::GetTouchContext(). The setups (ImGuiTouch::Setup(), SetKeyboardInsets(), SetupEmscripten(),
 // SetupEmscriptenKeyboard()) create it; the other ImGuiTouch functions assert that a setup was called.
 #pragma once
-#include "imgui_kit.h"
+#include "imgui_touch.h"
 #include "imgui_internal.h"  // ImRect, ImGuiWindow, ImGuiAxis
 
 #define IMGUI_TOUCH_FLICK_SAMPLES 16  // the swipe's recent positions of the finger: enough for 0.05 s at 240 fps
@@ -247,7 +248,7 @@ namespace ImGuiTouch
     ImRect ClaimRectOnScreen(const ImRect& item_rect);
     // The content moves on its own this frame (the inertia, the bounce, an animation): IsAnimating() is true
     void RequestAnimation();
-    void SetupKeepCaretInView(ImGuiContext* ctx);  // the caret kept above the keyboard (imgui_kit_touch_keyboard.cpp)
+    void SetupKeepCaretInView(ImGuiContext* ctx);  // the caret kept above the keyboard (imgui_touch_keyboard.cpp)
     // For the tests, which call the steps without the hooks: whether an animation was asked since the last call
     bool ConsumeAnimationRequest();
 }

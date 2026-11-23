@@ -1,13 +1,13 @@
-// imgui_kit's touch demo on Android: Dear ImGui's Android + OpenGL ES 3 example, plus the kit's touch layer (with
+// imgui_touch's touch demo on Android: Dear ImGui's Android + OpenGL ES 3 example, plus the touch layer (with
 // the fingers of the AMotionEvents: the pinch), its wheel session, and the keyboard's height from the activity.
-// https://github.com/pthom/imgui_kit (MIT license)
+// https://github.com/pthom/imgui_touch (MIT license)
 //
-// What the kit adds to Dear ImGui's example: the lines marked "imgui_kit".
+// What imgui_touch adds to Dear ImGui's example: the lines marked "imgui_touch".
 
 #include "imgui.h"
 #include "imgui_impl_android.h"
 #include "imgui_impl_opengl3.h"
-#include "imgui_kit.h"
+#include "imgui_touch.h"
 #include <android/configuration.h>
 #include <android/log.h>
 #include <android_native_app_glue.h>
@@ -20,7 +20,7 @@ static EGLSurface           g_EglSurface = EGL_NO_SURFACE;
 static EGLContext           g_EglContext = EGL_NO_CONTEXT;
 static struct android_app*  g_App = nullptr;
 static bool                 g_Initialized = false;
-static char                 g_LogTag[] = "imgui_kit";
+static char                 g_LogTag[] = "imgui_touch";
 static std::string          g_IniFilename;
 
 static void Init(struct android_app* app);
@@ -29,7 +29,7 @@ static void MainLoopStep();
 static int  CallActivityMethod(const char* name, bool returns_int);
 static void PollUnicodeChars();
 
-// imgui_kit: the fingers of a motion event, to the touch layer. Android reports all the pointers in one event:
+// imgui_touch: the fingers of a motion event, to the touch layer. Android reports all the pointers in one event:
 // the action says which one landed or lifted (its index is in the action's high bits), a move or a cancel is for
 // all of them. The ids are stable while a finger is down. Only the fingers: a mouse or a stylus is the mouse already.
 static void ForwardFingerEvents(const AInputEvent* event)
@@ -85,7 +85,7 @@ static void HandleAppCmd(struct android_app* app, int32_t app_cmd)
 static int32_t HandleInputEvent(struct android_app* app, AInputEvent* input_event)
 {
     if (AInputEvent_getType(input_event) == AINPUT_EVENT_TYPE_MOTION)
-        ForwardFingerEvents(input_event);  // imgui_kit: the fingers (the backend makes the mouse from the first one)
+        ForwardFingerEvents(input_event);  // imgui_touch: the fingers (the backend makes the mouse from the first one)
     return ImGui_ImplAndroid_HandleInputEvent(input_event);
 }
 
@@ -159,8 +159,7 @@ void Init(struct android_app* app)
     io.IniFilename = g_IniFilename.c_str();
     ImGui::StyleColorsDark();
 
-    ImGuiTouch::Setup();            // imgui_kit: the touch layer (swipe, long press, pinch)
-    ImGuiKit::SetupWheelSession();  // imgui_kit: the wheel stays with the window it scrolls
+    ImGuiTouch::Setup();            // imgui_touch: the touch layer (swipe, long press, pinch)
 
     ImGui_ImplAndroid_Init(g_App->window);
     ImGui_ImplOpenGL3_Init("#version 300 es");
@@ -182,7 +181,7 @@ void MainLoopStep()
 
     PollUnicodeChars();
 
-    // The on-screen keyboard follows io.WantTextInput; imgui_kit: its height, so that the caret stays above it
+    // The on-screen keyboard follows io.WantTextInput; imgui_touch: its height, so that the caret stays above it
     static bool want_text_input_last = false;
     if (io.WantTextInput != want_text_input_last)
         CallActivityMethod(io.WantTextInput ? "showSoftInput" : "hideSoftInput", false);
@@ -194,12 +193,12 @@ void MainLoopStep()
     ImGui_ImplAndroid_NewFrame();
     ImGui::NewFrame();
 
-    // The kit's demo, in a window that fills the screen, above the keyboard
+    // The touch layer's demo, in a window that fills the screen, above the keyboard
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, viewport->WorkSize.y - keyboard_height));
-    ImGui::Begin("imgui_kit", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
-    ImGuiKit::ShowDemoContents();
+    ImGui::Begin("imgui_touch", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+    ImGuiTouch::ShowDemoContents();
     ImGui::End();
 
     ImGui::Render();

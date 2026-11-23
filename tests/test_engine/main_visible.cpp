@@ -1,13 +1,13 @@
-// imgui_kit's Test Engine tests, in a window: the Test Engine's UI lists the tests, runs them at the chosen speed, and
+// imgui_touch's Test Engine tests, in a window: the Test Engine's UI lists the tests, runs them at the chosen speed, and
 // draws the mouse, which plays a finger.
-// Usage: imgui_kit_te_tests_visible          (pick and run the tests in the "Dear ImGui Test Engine" window)
-//        imgui_kit_te_tests_visible --auto   (runs all of them at a watchable speed, then exits with their result)
+// Usage: imgui_touch_te_tests_visible          (pick and run the tests in the "Dear ImGui Test Engine" window)
+//        imgui_touch_te_tests_visible --auto   (runs all of them at a watchable speed, then exits with their result)
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_te_engine.h"
 #include "imgui_te_ui.h"
-#include "kit_te_tests.h"
+#include "touch_te_tests.h"
 #include <stdio.h>
 #include <string.h>
 #define GL_SILENCE_DEPRECATION
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 #endif
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());
     GLFWwindow* window = glfwCreateWindow((int)(1300 * main_scale), (int)(900 * main_scale),
-                                          "imgui_kit: the Test Engine tests", nullptr, nullptr);
+                                          "imgui_touch: the Test Engine tests", nullptr, nullptr);
     if (window == nullptr)
         return 1;
     glfwMakeContextCurrent(window);
@@ -53,12 +53,12 @@ int main(int argc, char** argv)
     test_io.ConfigVerboseLevel = ImGuiTestVerboseLevel_Info;
     test_io.ConfigVerboseLevelOnError = ImGuiTestVerboseLevel_Debug;
     test_io.ConfigLogToTTY = autoRun;
-    // The kit's hooks before the engine's: the engine runs each test's GUI from its own NewFramePost hook,
-    // which must come after the touch layer and the wheel session
-    KitTestsSetup();
+    // The layer's hooks before the engine's: the engine runs each test's GUI from its own NewFramePost hook,
+    // which must come after the touch layer
+    TouchTestsSetup();
     ImGuiTestEngine_Start(engine, ImGui::GetCurrentContext());
 
-    KitTestsRegister(engine);
+    TouchTestsRegister(engine);
     if (autoRun)
         ImGuiTestEngine_QueueTests(engine, ImGuiTestGroup_Tests, nullptr, ImGuiTestRunFlags_RunFromCommandLine);
 
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
     ImGuiTestEngineResultSummary summary;
     ImGuiTestEngine_GetResultSummary(engine, &summary);
     if (autoRun)
-        printf("imgui_kit_te_tests_visible: %d of %d passed\n", summary.CountSuccess, summary.CountTested);
+        printf("imgui_touch_te_tests_visible: %d of %d passed\n", summary.CountSuccess, summary.CountTested);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

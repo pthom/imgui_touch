@@ -1,7 +1,7 @@
-// The activity of imgui_kit's Android touch demo: a NativeActivity, plus what native code cannot do by itself
+// The activity of imgui_touch's Android touch demo: a NativeActivity, plus what native code cannot do by itself
 // (Dear ImGui's example_android_opengl3 does the same): the on-screen keyboard, the typed characters, and, for the
-// kit, the keyboard's height. The C++ side calls these methods through JNI (main.cpp).
-package com.github.pthom.imguikit;
+// touch layer, the keyboard's height. The C++ side calls these methods through JNI (main.cpp).
+package com.github.pthom.imguitouch;
 
 import android.app.NativeActivity;
 import android.content.Context;
@@ -22,7 +22,7 @@ public class MainActivity extends NativeActivity
     protected void onStart()
     {
         super.onStart();
-        // The keyboard's height, in pixels, from the window's insets (API 30): the kit keeps the caret above it
+        // The keyboard's height, in pixels, from the window's insets (API 30): the touch layer keeps the caret above it
         if (Build.VERSION.SDK_INT >= 30)
             getWindow().getDecorView().setOnApplyWindowInsetsListener((View view, WindowInsets insets) -> {
                 Insets ime = insets.getInsets(WindowInsets.Type.ime());

@@ -1,12 +1,12 @@
-// The swipe layer (imgui_kit_touch_scroll.cpp) through Dear ImGui's null backend: the mouse and its source are
+// The swipe layer (imgui_touch_scroll.cpp) through Dear ImGui's null backend: the mouse and its source are
 // injected, the scroll of the windows is read back. The layer's steps are called directly, frame by frame.
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "doctest.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "imgui_impl_null.h"
-#include "imgui_kit.h"
-#include "imgui_kit_internal.h"
+#include "imgui_touch.h"
+#include "imgui_touch_internal.h"
 
 namespace
 {

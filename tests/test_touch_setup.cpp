@@ -3,12 +3,12 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "imgui_impl_null.h"
-#include "imgui_kit.h"
-#include "imgui_kit_internal.h"  // FindTouchContext
+#include "imgui_touch.h"
+#include "imgui_touch_internal.h"  // FindTouchContext
 
 namespace
 {
-    // A window of 100 lines, 400x300 at (0,0), the touch layer and the wheel session set up
+    // A window of 100 lines, 400x300 at (0,0), the touch layer set up
     struct HookBench
     {
         float scrollY = 0.f;
@@ -21,7 +21,6 @@ namespace
             config.ScrollMode = ImGuiTouchScrollMode_Always;  // the mouse drives it, as a finger would
             ImGuiTouch::Setup(config);
             ImGuiTouch::Setup(config);  // a second call installs nothing more
-            ImGuiKit::SetupWheelSession();
         }
         ~HookBench() { ImGui_ImplNull_Shutdown(); ImGui::DestroyContext(); }
         void Frame()
@@ -50,8 +49,8 @@ TEST_CASE("Touch setup: the hooks run the layer: a drag scrolls, the release coa
     int hooks = 0;
     for (const ImGuiContextHook& hook : ImGui::GetCurrentContext()->Hooks)
         hooks += (hook.Type != ImGuiContextHookType_PendingRemoval_);
-    CHECK(hooks == 7);  // touch: NewFramePre, NewFramePost, EndFramePre, RenderPost; the wheel session: NewFramePre,
-                        // NewFramePost; the touch state: Shutdown (it frees the state with the context)
+    CHECK(hooks == 5);  // NewFramePre, NewFramePost, EndFramePre, RenderPost; the touch state: Shutdown (it frees the
+                        // state with the context)
 
     io.AddMousePosEvent(200, 200);
     b.Frame();

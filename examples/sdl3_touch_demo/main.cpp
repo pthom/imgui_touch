@@ -1,18 +1,18 @@
-// imgui_kit's touch demo on SDL3: Dear ImGui's SDL3 + SDL_Renderer example, plus the kit's touch layer (with SDL's
+// imgui_touch's touch demo on SDL3: Dear ImGui's SDL3 + SDL_Renderer example, plus the touch layer (with SDL's
 // fingers: the pinch) and wheel session. The desktop and iOS (SDL_Renderer draws with Metal there).
-// https://github.com/pthom/imgui_kit (MIT license)
+// https://github.com/pthom/imgui_touch (MIT license)
 //
-// What the kit adds to Dear ImGui's example: the lines marked "imgui_kit".
+// What imgui_touch adds to Dear ImGui's example: the lines marked "imgui_touch".
 
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
-#include "imgui_kit.h"
+#include "imgui_touch.h"
 #include <stdio.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>  // iOS needs SDL's own main
 
-// imgui_kit: a finger of a touch screen, to the touch layer. SDL gives its position as a fraction of the window: in
+// imgui_touch: a finger of a touch screen, to the touch layer. SDL gives its position as a fraction of the window: in
 // the window's coordinates here, as the mouse's (the first finger is also the mouse, through SDL). A trackpad is a
 // touch device too, an indirect one: only the screens, and the mouse when SDL makes it a touch device
 // (SDL_HINT_MOUSE_TOUCH_EVENTS).
@@ -42,7 +42,7 @@ int main(int, char**)
     }
     float main_scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
     SDL_WindowFlags window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY;
-    SDL_Window* window = SDL_CreateWindow("imgui_kit touch demo (SDL3)", (int)(600 * main_scale),
+    SDL_Window* window = SDL_CreateWindow("imgui_touch touch demo (SDL3)", (int)(600 * main_scale),
                                           (int)(800 * main_scale), window_flags);
     if (window == nullptr)
     {
@@ -69,8 +69,7 @@ int main(int, char**)
     style.ScaleAllSizes(main_scale);
     style.FontScaleDpi = main_scale;
 
-    ImGuiTouch::Setup();            // imgui_kit: the touch layer (swipe, long press, pinch)
-    ImGuiKit::SetupWheelSession();  // imgui_kit: the wheel stays with the window it scrolls
+    ImGuiTouch::Setup();            // imgui_touch: the touch layer (swipe, long press, pinch)
 
     ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer3_Init(renderer);
@@ -78,8 +77,8 @@ int main(int, char**)
     bool done = false;
     while (!done)
     {
-        // imgui_kit: an app that sleeps when nothing happens keeps drawing while something of the kit moves
-        if (!ImGuiKit::IsAnimating())
+        // imgui_touch: an app that sleeps when nothing happens keeps drawing while the touch layer moves something
+        if (!ImGuiTouch::IsAnimating())
             SDL_WaitEventTimeout(nullptr, 100);
         SDL_Event event;
         while (SDL_PollEvent(&event))
@@ -87,7 +86,7 @@ int main(int, char**)
             ImGui_ImplSDL3_ProcessEvent(&event);
             if (event.type == SDL_EVENT_FINGER_DOWN || event.type == SDL_EVENT_FINGER_MOTION
                 || event.type == SDL_EVENT_FINGER_UP || event.type == SDL_EVENT_FINGER_CANCELED)
-                ForwardFingerEvent(event.tfinger, window);  // imgui_kit: the fingers
+                ForwardFingerEvent(event.tfinger, window);  // imgui_touch: the fingers
             if (event.type == SDL_EVENT_QUIT)
                 done = true;
             if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window))
@@ -103,12 +102,12 @@ int main(int, char**)
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
 
-        // The kit's demo, in a window that fills the screen (on a phone, the whole display)
+        // The touch layer's demo, in a window that fills the screen (on a phone, the whole display)
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
         ImGui::SetNextWindowSize(viewport->WorkSize);
-        ImGui::Begin("imgui_kit", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
-        ImGuiKit::ShowDemoContents();
+        ImGui::Begin("imgui_touch", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+        ImGuiTouch::ShowDemoContents();
         ImGui::End();
 
         ImGui::Render();

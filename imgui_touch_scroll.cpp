@@ -1,5 +1,5 @@
-// imgui_kit: the swipe of a touch screen (ImGuiTouch)
-// https://github.com/pthom/imgui_kit (MIT license)
+// imgui_touch: the swipe of a touch screen (ImGuiTouch)
+// https://github.com/pthom/imgui_touch (MIT license)
 
 /*
 
@@ -17,8 +17,8 @@ Index of this file:
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
-#include "imgui_kit.h"
-#include "imgui_kit_touch_internal.h"
+#include "imgui_touch.h"
+#include "imgui_touch_internal.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"

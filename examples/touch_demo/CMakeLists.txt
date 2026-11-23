@@ -1,10 +1,10 @@
-# imgui_kit's touch demo: Dear ImGui's GLFW + OpenGL3 backends, for the desktop and the web (Emscripten).
-# Needs the Dear ImGui folder (its backends and its Emscripten shell): built with the kit's own Dear ImGui.
-set(imgui_dir ${IMGUI_KIT_IMGUI_DIR})
+# imgui_touch's touch demo: Dear ImGui's GLFW + OpenGL3 backends, for the desktop and the web (Emscripten).
+# Needs the Dear ImGui folder (its backends and its Emscripten shell): built with imgui_touch's own Dear ImGui.
+set(imgui_dir ${IMGUI_TOUCH_IMGUI_DIR})
 add_executable(touch_demo main.cpp ${imgui_dir}/backends/imgui_impl_glfw.cpp ${imgui_dir}/backends/imgui_impl_opengl3.cpp)
 target_include_directories(touch_demo PRIVATE ${imgui_dir}/backends)
-target_link_libraries(touch_demo PRIVATE imgui_kit)
-set_target_properties(touch_demo PROPERTIES CXX_STANDARD 17)  # the GLFW port's emscripten_glfw3.h (the kit: C++11)
+target_link_libraries(touch_demo PRIVATE imgui_touch)
+set_target_properties(touch_demo PROPERTIES CXX_STANDARD 17)  # the GLFW port's emscripten_glfw3.h (imgui_touch: C++11)
 
 if (EMSCRIPTEN)
     # The emscripten-glfw port (contrib.glfw3), as Dear ImGui's example: a better support of high DPI displays

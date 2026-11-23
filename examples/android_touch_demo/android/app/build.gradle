@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace 'com.github.pthom.imguikit'
+    namespace 'com.github.pthom.imguitouch'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.github.pthom.imguikit.touchdemo"
+        applicationId "com.github.pthom.imguitouch.touchdemo"
         minSdk 24
         targetSdk 34
         versionCode 1
@@ -13,9 +13,9 @@ android {
         externalNativeBuild {
             cmake {
                 // Dear ImGui's folder: -PimguiDir=/path/to/imgui (in gradle.properties: imguiDir=...).
-                // Without it, the kit fetches Dear ImGui.
+                // Without it, imgui_touch fetches Dear ImGui.
                 if (project.hasProperty('imguiDir'))
-                    arguments "-DIMGUI_KIT_IMGUI_DIR=${project.property('imguiDir')}"
+                    arguments "-DIMGUI_TOUCH_IMGUI_DIR=${project.property('imguiDir')}"
             }
         }
     }

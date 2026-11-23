@@ -1,8 +1,8 @@
-// imgui_kit's tests with Dear ImGui's Test Engine: the touch layer and the wheel session, driven as a user would.
+// imgui_touch's tests with Dear ImGui's Test Engine: the touch layer, driven as a user would.
 // The Test Engine moves its mouse; the tests give it a touch screen's source, so that it plays a finger.
 #define IMGUI_DEFINE_MATH_OPERATORS
-#include "kit_te_tests.h"
-#include "imgui_kit.h"
+#include "touch_te_tests.h"
+#include "imgui_touch.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "imgui_te_context.h"
@@ -114,13 +114,12 @@ namespace
     }
 }  // namespace
 
-void KitTestsSetup()
+void TouchTestsSetup()
 {
     ImGuiTouch::Setup();
-    ImGuiKit::SetupWheelSession();
 }
 
-void KitTestsRegister(ImGuiTestEngine* engine)
+void TouchTestsRegister(ImGuiTestEngine* engine)
 {
     ImGuiTest* t = nullptr;
 
@@ -197,31 +196,6 @@ void KitTestsRegister(ImGuiTestEngine* engine)
         IM_CHECK_EQ(g_lab.scrollY, 0.f);
     };
 
-    // A wheel that scrolls the page keeps scrolling it when the zoomable item comes under the still mouse: the item
-    // does not zoom. Once the session ended, a wheel that starts on the item zooms it.
-    t = IM_REGISTER_TEST(engine, "wheel", "session_keeps_the_page");
-    t->GuiFunc = [](ImGuiTestContext*) { LabGui(); };
-    t->TestFunc = [](ImGuiTestContext* ctx) {
-        ResetLab(ctx);
-        UseMouse(ctx);
-        ImGuiTestItemInfo zoomable = ctx->ItemInfo("Zoomable (the wheel zooms it)");
-        ctx->MouseMoveToPos(ImVec2(zoomable.RectFull.GetCenter().x, zoomable.RectFull.Min.y - 30.f));
-        for (int i = 0; i < 4; i++)
-        {
-            ctx->MouseWheelY(-1.f);
-            ctx->Yield(2);
-        }
-        IM_CHECK_GT(g_lab.scrollY, 0.f);
-        IM_CHECK_EQ(g_lab.zoom, 1.f);
-        ctx->SleepNoSkip(1.f, 1.f / 60.f);  // the session ends (0.7 s)
-        ctx->MouseMoveToPos(ctx->ItemInfo("Zoomable (the wheel zooms it)").RectFull.GetCenter());
-        const float scrolled = g_lab.scrollY;
-        ctx->MouseWheelY(1.f);
-        ctx->Yield(2);
-        IM_CHECK_GT(g_lab.zoom, 1.f);
-        IM_CHECK_EQ(g_lab.scrollY, scrolled);
-    };
-
     // Two fingers that spread on the zoomable item zoom it, by wheel notches, and the font does not scale. The fingers
     // come through ImGuiTouch::AddFingerEvent(), as a platform reports them; the first one is the mouse.
     t = IM_REGISTER_TEST(engine, "touch", "pinch_on_a_widget_zooms_it");
@@ -288,18 +262,18 @@ void KitTestsRegister(ImGuiTestEngine* engine)
         IM_CHECK_EQ(g_lab.clicks, 0);
     };
 
-    // The kit's demo: in its Touch section, a sideways swipe on the row of cards scrolls the row (a child in a child,
+    // The demo: in its Gestures section, a sideways swipe on the row of cards scrolls the row (a child in a child,
     // which the test reaches through their windows)
     t = IM_REGISTER_TEST(engine, "demo", "touch_cards_swipe_sideways");
     t->GuiFunc = [](ImGuiTestContext*) {
         ImGui::SetNextWindowPos(ImVec2(500.f, 20.f), ImGuiCond_Appearing);
-        ImGuiKit::ShowDemoWindow();
+        ImGuiTouch::ShowDemoWindow();
     };
     t->TestFunc = [](ImGuiTestContext* ctx) {
-        ctx->SetRef("//ImGuiKit Demo");
-        ctx->ItemOpen("Touch");
+        ctx->SetRef("//ImGuiTouch Demo");
+        ctx->ItemOpen("Gestures");
         ctx->Yield(2);
-        ImGuiWindow* demo = ctx->GetWindowByRef("//ImGuiKit Demo");
+        ImGuiWindow* demo = ctx->GetWindowByRef("//ImGuiTouch Demo");
         ImGuiWindow* zone = FindWindowNamed(ctx, "##touch_zone");
         ImGuiWindow* row = FindWindowNamed(ctx, "##sideways");
         IM_CHECK(demo != nullptr && zone != nullptr && row != nullptr);
@@ -312,7 +286,7 @@ void KitTestsRegister(ImGuiTestEngine* engine)
         Swipe(ctx, center, center - ImVec2(120.f, 0.f));
         ctx->Yield(10);
         IM_CHECK_GT(row->Scroll.x, 50.f);
-        ctx->ItemClose("Touch");
+        ctx->ItemClose("Gestures");
     };
 
     // The same row: a sideways drag that starts on its slider moves the slider (SetItemTakesDrags(ImGuiTouchAxis_X)),
@@ -321,13 +295,13 @@ void KitTestsRegister(ImGuiTestEngine* engine)
     t = IM_REGISTER_TEST(engine, "demo", "touch_row_slider_takes_sideways_drag");
     t->GuiFunc = [](ImGuiTestContext*) {
         ImGui::SetNextWindowPos(ImVec2(500.f, 20.f), ImGuiCond_Appearing);
-        ImGuiKit::ShowDemoWindow();
+        ImGuiTouch::ShowDemoWindow();
     };
     t->TestFunc = [](ImGuiTestContext* ctx) {
-        ctx->SetRef("//ImGuiKit Demo");
-        ctx->ItemOpen("Touch");
+        ctx->SetRef("//ImGuiTouch Demo");
+        ctx->ItemOpen("Gestures");
         ctx->Yield(2);
-        ImGuiWindow* demo = ctx->GetWindowByRef("//ImGuiKit Demo");
+        ImGuiWindow* demo = ctx->GetWindowByRef("//ImGuiTouch Demo");
         ImGuiWindow* zone = FindWindowNamed(ctx, "##touch_zone");
         ImGuiWindow* row = FindWindowNamed(ctx, "##sideways");
         IM_CHECK(demo != nullptr && zone != nullptr && row != nullptr);
@@ -341,6 +315,6 @@ void KitTestsRegister(ImGuiTestEngine* engine)
         Swipe(ctx, slider, slider - ImVec2(80.f, 0.f));
         ctx->Yield(10);
         IM_CHECK_EQ(row->Scroll.x, 0.f);
-        ctx->ItemClose("Touch");
+        ctx->ItemClose("Gestures");
     };
 }
