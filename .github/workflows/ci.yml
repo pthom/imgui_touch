@@ -22,9 +22,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y xorg-dev libwayland-dev libxkbcommon-dev libgl-dev
       - name: The embedded JavaScript (its copy in the C++ is current, its syntax holds)
         if: runner.os == 'Linux'
-        run: python3 tools/embed_js.py --check && node --check imgui_kit_emscripten_keyboard.js
+        run: python3 tools/embed_js.py --check && node --check imgui_touch_emscripten_keyboard.js
       - name: Configure (Dear ImGui and its Test Engine fetched)
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DIMGUI_KIT_BUILD_TEST_ENGINE_TESTS=ON
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DIMGUI_TOUCH_BUILD_TEST_ENGINE_TESTS=ON
       - name: Build
         run: cmake --build build --config ${{ matrix.config }} -j 4
       - name: Test
@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure (Xcode, the examples)
-        run: cmake -S . -B build_ios -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0 -DIMGUI_KIT_BUILD_EXAMPLES=ON -DIMGUI_KIT_BUILD_TESTS=OFF
+        run: cmake -S . -B build_ios -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0 -DIMGUI_TOUCH_BUILD_EXAMPLES=ON -DIMGUI_TOUCH_BUILD_TESTS=OFF
       - name: Build
         run: cmake --build build_ios --config Release --target ios_touch_demo -- -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO
 
@@ -57,7 +57,7 @@ jobs:
         run: gradle assembleDebug -Pandroid.injected.build.abi=arm64-v8a
         working-directory: examples/android_touch_demo/android
 
-  # The touch demo in a browser, published on the kit's GitHub Pages (https://pthom.github.io/imgui_kit/)
+  # The touch demo in a browser, published on imgui_touch's GitHub Pages (https://pthom.github.io/imgui_touch/)
   web:
     runs-on: ubuntu-latest
     steps:
@@ -66,13 +66,13 @@ jobs:
         with:
           version: 5.0.4
       - name: Configure (Emscripten, the touch demo)
-        run: emcmake cmake -S . -B build_web -DCMAKE_BUILD_TYPE=Release -DIMGUI_KIT_BUILD_EXAMPLES=ON -DIMGUI_KIT_BUILD_TESTS=OFF
+        run: emcmake cmake -S . -B build_web -DCMAKE_BUILD_TYPE=Release -DIMGUI_TOUCH_BUILD_EXAMPLES=ON -DIMGUI_TOUCH_BUILD_TESTS=OFF
       - name: Fetch Emscripten's GLFW port once, with retries (its GitHub release download is flaky)
         run: for i in 1 2 3; do embuilder build contrib.glfw3 && break; sleep 10; done; embuilder build contrib.glfw3
       - name: Build
         run: cmake --build build_web -j 4
       - name: The page's files
-        run: mkdir site && cp build_web/examples/touch_demo/index.{html,js,wasm} site/ && cp llms.txt site/
+        run: mkdir site && cp build_web/examples/touch_demo/index.{html,js,wasm} site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

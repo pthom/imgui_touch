@@ -30,8 +30,8 @@ Most of them are already available in Hello ImGui and Dear ImGui Bundle. This re
 
 | Part | Public API | Files | Lines |
 |---|---|---|---|
-| Touch layer | `ImGuiTouch::` (section "Touch" of `imgui_kit.h`) | `imgui_kit_touch_internal.h`, `imgui_kit_touch*.cpp` | about 1,220 |
-| Its browser glue (Emscripten) | `ImGuiTouch::SetupEmscripten()`, `SetupEmscriptenKeyboard()` | `imgui_kit_emscripten*.cpp` | about 960 |
+| Touch layer | `ImGuiTouch::` (section "Touch" of `imgui_touch.h`) | `imgui_touch_internal.h`, `imgui_touch*.cpp` | about 1,220 |
+| Its browser glue (Emscripten) | `ImGuiTouch::SetupEmscripten()`, `SetupEmscriptenKeyboard()` | `imgui_touch_emscripten*.cpp` | about 960 |
 | Wheel session | `ImGuiKit::SetupWheelSession()` (section "Wheel session") | `imgui_kit_wheel_session.cpp` | about 160 |
 
 - Neither part uses the other.
@@ -93,9 +93,9 @@ These rules are copied, not called (they are inside functions of Dear ImGui that
 |---|---|---|---|
 | `imgui_kit_wheel_session.cpp`, `ScrollByWheel` | the wheel's step: 5 lines of `FontRefSize`, at most 67% of the inner height | `UpdateMouseWheel` | `test_wheel_session.cpp` ("the page scrolls the zooming item under it, and keeps scrolling") |
 | `imgui_kit_wheel_session.cpp`, the lock's delay | 0.7 s | `WINDOWS_MOUSE_WHEEL_SCROLL_LOCK_TIMER` | `test_wheel_session.cpp` ("a session ends after a pause") |
-| `imgui_kit_touch_scroll.cpp`, `ScrollTarget` and `ScrollsWithPointer` | the window a wheel scrolls: the hovered one, or the first parent that can scroll that way; `NoScrollWithMouse` refuses, unless `NoMouseInputs` | `FindBestWheelingWindow` | `test_touch_scroll.cpp` ("a child scrolls itself, and its parent when it cannot scroll that way") |
-| `imgui_kit_touch_scroll.cpp`, `DrawTouchScrollbarGrab` | the thumb's position and length along the bar | `ScrollbarEx` | `test_touch_scroll.cpp` ("a thin scroll bar held by a finger widens over the content") |
-| `imgui_kit_touch_scroll.cpp`, `ReplayPress` | the double click's bookkeeping: `MouseClickedTime`, `MouseClickedPos`, `MouseClickedLastCount` | `UpdateMouseInputs` | `test_touch_scroll.cpp` ("two taps are a double click, a tap after a pause is not") |
+| `imgui_touch_scroll.cpp`, `ScrollTarget` and `ScrollsWithPointer` | the window a wheel scrolls: the hovered one, or the first parent that can scroll that way; `NoScrollWithMouse` refuses, unless `NoMouseInputs` | `FindBestWheelingWindow` | `test_touch_scroll.cpp` ("a child scrolls itself, and its parent when it cannot scroll that way") |
+| `imgui_touch_scroll.cpp`, `DrawTouchScrollbarGrab` | the thumb's position and length along the bar | `ScrollbarEx` | `test_touch_scroll.cpp` ("a thin scroll bar held by a finger widens over the content") |
+| `imgui_touch_scroll.cpp`, `ReplayPress` | the double click's bookkeeping: `MouseClickedTime`, `MouseClickedPos`, `MouseClickedLastCount` | `UpdateMouseInputs` | `test_touch_scroll.cpp` ("two taps are a double click, a tap after a pause is not") |
 
 ### What Dear ImGui could offer
 
@@ -119,11 +119,11 @@ Each item would replace a workaround in the layer:
 
 ### Where to start reading
 
-1. `imgui_kit.h`, section "Touch (ImGuiTouch)": the API and the config.
-2. `imgui_kit_touch_internal.h`, the context data for touch handling
-3. `imgui_kit_touch.cpp`: the setup and the hooks.
-4. `imgui_kit_touch_scroll.cpp`: the swipe, the tap, the hold, the long press. Its top comment is the design.
-5. `imgui_kit_touch_pinch.cpp`, `imgui_kit_touch_keyboard.cpp`.
+1. `imgui_touch.h`, section "Touch (ImGuiTouch)": the API and the config.
+2. `imgui_touch_internal.h`, the context data for touch handling
+3. `imgui_touch.cpp`: the setup and the hooks.
+4. `imgui_touch_scroll.cpp`: the swipe, the tap, the hold, the long press. Its top comment is the design.
+5. `imgui_touch_pinch.cpp`, `imgui_touch_keyboard.cpp`.
 6. `tests/`: headless tests through the null backend. `tests/test_engine/`: the gestures driven by the Test Engine, headless or in a window.
 
 ## The wheel session
