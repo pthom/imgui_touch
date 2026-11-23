@@ -191,7 +191,7 @@ ImGuiTouch::SetupEmscripten();  // in a browser: which pointer is a finger, the 
 // - A widget that zooms: ImGuiTouch::ItemPinch() right after it (SetItemPinchAsWheel() if it zooms by the wheel).
 // Hello ImGui does the setup itself (RunnerParams::touch_config).)";
 
-// The settings change the application's touch layer, live. "Simulate a touch source" lets the mouse play a finger.
+// The settings change the application's touch layer, live. "Simulate touch" lets the mouse play a finger.
 static void DemoGestures()
 {
     IMGUI_DEMO_MARKER("Gestures");
@@ -216,7 +216,7 @@ static void DemoGestures()
         if (!(io.ConfigFlags & ImGuiConfigFlags_IsTouchScreen))
         {
             SettingRow("On a desktop");
-            ImGui::Checkbox("Simulate a touch source", &config.SimulateTouch);
+            ImGui::Checkbox("Simulate touch", &config.SimulateTouch);
             HelpMarker("The mouse plays a finger (ImGuiTouchConfig::SimulateTouch): every gesture works in the zone "
                        "below, as on a phone.\n\n"
                        "- Drag up or down to scroll the content. Start moving as soon as you press, as with a "
@@ -225,11 +225,9 @@ static void DemoGestures()
                        "click).");
         }
         SettingRow("Swipe");
-        ImGui::RadioButton("Touch", &config.ScrollMode, ImGuiTouchScrollMode_Auto);
-        ImGui::SameLine();
-        ImGui::RadioButton("Always", &config.ScrollMode, ImGuiTouchScrollMode_Always);
-        ImGui::SameLine();
-        ImGui::RadioButton("Off", &config.ScrollMode, ImGuiTouchScrollMode_Disabled);
+        const char* scroll_modes[] = { "Touch", "Always", "Off" };  // the order of ImGuiTouchScrollMode_
+        ImGui::SetNextItemWidth(8.0f * em);
+        ImGui::Combo("##scroll_mode", &config.ScrollMode, scroll_modes, IM_ARRAYSIZE(scroll_modes));
         HelpMarker("Touch: the swipe follows a finger only. Always: the mouse's left button drags the content too, "
                    "while the mouse stays a mouse.");
         SettingRow("Pinch");
@@ -241,7 +239,7 @@ static void DemoGestures()
                    "slider, a text selection). At zero, the widgets get every press at once.");
         SettingRow("Long press");
         ImGui::Checkbox("is a right click", &config.LongPressIsRightClick);
-        ImGui::SameLine();
+        SettingRow("Its delay");
         ImGui::SetNextItemWidth(8.0f * em);
         ImGui::SliderFloat("##long_press", &config.LongPressSeconds, 0.3f, 2.0f, "%.2f s");
         SettingRow("Scroll bars");

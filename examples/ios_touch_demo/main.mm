@@ -104,8 +104,8 @@
     ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x - (float)(safe.left + safe.right),
                                     io.DisplaySize.y - (float)safe.top - bottom));
     ImGui::Begin("imgui_touch touch demo", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings);
-    ImGui::TextWrapped("Open \"Touch\" below, then try it with a finger.");
-    ImGui::TextLinkOpenURL("See the full interactive explorer", "https://pthom.github.io/imgui_explorer/?lib=imguikit");
+    ImGui::TextWrapped("Try it with a finger.");
+    ImGui::TextLinkOpenURL("The code, on GitHub", "https://github.com/pthom/imgui_touch");
     ImGuiTouch::ShowDemoContents();
     ImGui::End();
 
