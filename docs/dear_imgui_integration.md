@@ -1,46 +1,33 @@
-# imgui_kit and Dear ImGui: notes for a possible integration
+# imgui_touch and Dear ImGui: notes for a possible integration
 
 By Pascal Thomet, 2026.
 
 ----
 
-imgui_kit is a set of utilities for Dear ImGui. It groups some of the components and utilities I have developed since I started working in the Dear ImGui ecosystem, in 2020.
+imgui_touch is a touch layer for Dear ImGui: it handles touch and multitouch interactions on a touch screen, and the phone's keyboard. It was added first in Dear ImGui Bundle v1.93. See [ocornut/imgui#3379](https://github.com/ocornut/imgui/issues/3379).
 
-Most of them are already available in Hello ImGui and Dear ImGui Bundle. This repository is an effort to make them available to more people in the Dear ImGui world.
-
-**It contains:**
-- Some (simple) widgets: Segmented switch, icons, Resize handle, etc.
-- Some layout utilities: label column, group panel, flow, etc. Aligned groups were proposed in [#9330](https://github.com/ocornut/imgui/issues/9330).
-- A simple DPI handling utility: EmToVec2 (makes it easy to size widgets relative to the font size). Proposed in [#6145](https://github.com/ocornut/imgui/pull/6145).
-- A touch layer (added first in Dear ImGui Bundle v1.93): handles touch and multitouch interactions on a touch screen. Also handles the touch keyboard. See [ocornut/imgui#3379](https://github.com/ocornut/imgui/issues/3379).
-- A smaller patch to better handle "wheel session": a wheel movement that started on a widget should keep acting on it, and not end up acting on other ones. Related: [#9587](https://github.com/ocornut/imgui/pull/9587).
+It started inside [imgui_kit](https://github.com/pthom/imgui_kit), a set of small utilities for Dear ImGui (widgets, layout, em units, a wheel session). It is now a library of its own: touch only.
 
 **Try it, see its manual**
-- Try it inside the ImGui Explorer (together with code): https://pthom.github.io/imgui_explorer/?lib=imguikit
-- Try it online (no code): https://pthom.github.io/imgui_kit/
+- Try it inside the ImGui Explorer (together with code): https://pthom.github.io/imgui_explorer/?lib=imguitouch
+- Try it online (no code): https://pthom.github.io/imgui_touch/
 - Phone demos: `examples/touch_demo` (GLFW, desktop and web), `examples/sdl3_touch_demo` (SDL3, desktop and iOS, the fingers from SDL), `examples/ios_touch_demo` (Metal, iOS, UIKit's touches) and `examples/android_touch_demo` (imgui_impl_android, the pointers of the motion events, the keyboard's height).
-
 
 **Context**
 * [ocornut/imgui#3379](https://github.com/ocornut/imgui/issues/3379) : drag to scroll
-* [#9587](https://github.com/ocornut/imgui/pull/9587) : the wheel's owner when a lock starts
+* The wheel session (a mouse wheel, not a finger) stays in imgui_kit: [its notes](https://github.com/pthom/imgui_kit/blob/main/docs/dear_imgui_integration.md).
 
 
-## Two independent parts
+## The parts
 
 | Part | Public API | Files | Lines |
 |---|---|---|---|
-| Touch layer | `ImGuiTouch::` (section "Touch" of `imgui_touch.h`) | `imgui_touch_internal.h`, `imgui_touch*.cpp` | about 1,220 |
-| Its browser glue (Emscripten) | `ImGuiTouch::SetupEmscripten()`, `SetupEmscriptenKeyboard()` | `imgui_touch_emscripten*.cpp` | about 960 |
-| Wheel session | `ImGuiKit::SetupWheelSession()` (section "Wheel session") | `imgui_kit_wheel_session.cpp` | about 160 |
+| Touch layer | `ImGuiTouch::` (`imgui_touch.h`) | `imgui_touch_internal.h`, `imgui_touch*.cpp` | about 1,900 |
+| Its browser glue (Emscripten) | `ImGuiTouch::SetupEmscripten()`, `SetupEmscriptenKeyboard()` | `imgui_touch_emscripten*.cpp` | about 1,100 |
 
-- Neither part uses the other.
-- Both are set up once, after `ImGui::CreateContext()`, and then run through context hooks (`ImGui::AddContextHook`). An app adds nothing to its frame.
-- Both keep their state per Dear ImGui context, with no static state.
+- Set up once, after `ImGui::CreateContext()`, it then runs through context hooks (`ImGui::AddContextHook`). An app adds nothing to its frame.
+- It keeps its state per Dear ImGui context, with no static state.
 - C++11, no STL, no allocation per frame, no warnings with `-Wall -Wextra -Wshadow -Wformat`.
-
-> [!NOTE]
-> Apart from those, imgui_kit also provides widget and layout utilities, which are not documented here.
 
 ## The touch layer
 
@@ -85,14 +72,12 @@ The answer to the mouse-down point in #3379 ([2025-06-05](https://github.com/oco
 - *Scrolling and drawing*: `SetScrollX`, `SetScrollY`, `GetWindowScrollbarRect`, `GetForegroundDrawList`, `ImGuiWindow::Scroll`, `ScrollMax`, `InnerRect`, `ContentSize`.
 - *Text input (the phone's keyboard)*: `GetInputTextState`, `g.InputTextState`, `g.PlatformImeData`, `g.PlatformImeDataPrev`, `g.NavWindow`.
 
-### What the kit copies from Dear ImGui
+### What the layer copies from Dear ImGui
 
 These rules are copied, not called (they are inside functions of Dear ImGui that do more). At a Dear ImGui bump, each one is checked against its source; the tests named catch a drift in the behaviour.
 
-| Where in the kit | What | From (`imgui.cpp`) | Test |
+| Where | What | From (`imgui.cpp`) | Test |
 |---|---|---|---|
-| `imgui_kit_wheel_session.cpp`, `ScrollByWheel` | the wheel's step: 5 lines of `FontRefSize`, at most 67% of the inner height | `UpdateMouseWheel` | `test_wheel_session.cpp` ("the page scrolls the zooming item under it, and keeps scrolling") |
-| `imgui_kit_wheel_session.cpp`, the lock's delay | 0.7 s | `WINDOWS_MOUSE_WHEEL_SCROLL_LOCK_TIMER` | `test_wheel_session.cpp` ("a session ends after a pause") |
 | `imgui_touch_scroll.cpp`, `ScrollTarget` and `ScrollsWithPointer` | the window a wheel scrolls: the hovered one, or the first parent that can scroll that way; `NoScrollWithMouse` refuses, unless `NoMouseInputs` | `FindBestWheelingWindow` | `test_touch_scroll.cpp` ("a child scrolls itself, and its parent when it cannot scroll that way") |
 | `imgui_touch_scroll.cpp`, `DrawTouchScrollbarGrab` | the thumb's position and length along the bar | `ScrollbarEx` | `test_touch_scroll.cpp` ("a thin scroll bar held by a finger widens over the content") |
 | `imgui_touch_scroll.cpp`, `ReplayPress` | the double click's bookkeeping: `MouseClickedTime`, `MouseClickedPos`, `MouseClickedLastCount` | `UpdateMouseInputs` | `test_touch_scroll.cpp` ("two taps are a double click, a tap after a pause is not") |
@@ -101,15 +86,15 @@ These rules are copied, not called (they are inside functions of Dear ImGui that
 
 Each item would replace a workaround in the layer:
 
-| Need | Today in the kit | A possible form in Dear ImGui                                                 |
+| Need | Today in the layer | A possible form in Dear ImGui                                                 |
 |---|---|-------------------------------------------------------------------------------|
 | Owning a press before the widgets | a sentinel active id | perhaps the `ImGuiWindowBgClickFlags` [mentioned in #3379](https://github.com/ocornut/imgui/issues/3379#issuecomment-6420664530) |
 | Telling a replayed event from a backend's | `AddedByTestEngine` (the Test Engine erases events without it, so the replays need it) | a generic "not from the backend" flag                                         |
 | A per-context slot for an extension | a `Shutdown` hook's `UserData`, found by scanning the hooks (as the Test Engine does) | a user-data slot in `ImGuiContext`                                            |
-| Knowing which widgets a finger drags along an axis (sliders, drags) | `SetItemTakesDrags(ImGuiTouchAxis_X)` after each one; in Dear ImGui Bundle's fork, a callback that Dear ImGui's draggable widgets call ([`ItemDragAxisCallback`](https://github.com/pthom/imgui/blob/imgui_bundle/imgui_internal.h): about 20 lines, a generic commit), which the kit listens to | that callback, upstream: then every app's sliders take a finger's drag along their axis |
-| Several fingers from the backend | `ImGuiTouch::AddFingerEvent(id, pos, phase)` | an `io.AddTouchPointEvent()`                                                  |
+| Knowing which widgets a finger drags along an axis (sliders, drags) | `SetItemTakesDrags(ImGuiTouchAxis_X)` after each one; in Dear ImGui Bundle's fork, a callback that Dear ImGui's draggable widgets call ([`ItemDragAxisCallback`](https://github.com/pthom/imgui/blob/imgui_bundle/imgui_internal.h): about 20 lines, a generic commit), which the layer listens to | that callback, upstream: then every app's sliders take a finger's drag along their axis |
+| Several fingers from the backend | `ImGuiTouch::AddFingerEvent(id, pos, phase)` | an `io.AddTouchEvent()`                                                       |
 | A link that opens in a new tab in every browser (WebKit allows a new tab only from the gesture's own handler, not from the frame loop where Dear ImGui sees the click) | `ImGuiTouch::SetItemOpensUrl(url)` after the link: the page keeps the links' rectangles and opens from its own handler | a callback from `TextLinkOpenURL` with each link's rectangle and url, per frame, which a browser backend would use the same way |
-| Running before the hooks that draw a GUI (the Test Engine draws its tests from a `NewFramePost` hook) | the kit is set up before `ImGuiTestEngine_Start()`: hooks run in the order they were added | an order, or a priority, for context hooks |
+| Running before the hooks that draw a GUI (the Test Engine draws its tests from a `NewFramePost` hook) | the layer is set up before `ImGuiTestEngine_Start()`: hooks run in the order they were added | an order, or a priority, for context hooks |
 
 ### Cost
 
@@ -119,44 +104,21 @@ Each item would replace a workaround in the layer:
 
 ### Where to start reading
 
-1. `imgui_touch.h`, section "Touch (ImGuiTouch)": the API and the config.
+1. `imgui_touch.h`: the API and the config.
 2. `imgui_touch_internal.h`, the context data for touch handling
 3. `imgui_touch.cpp`: the setup and the hooks.
 4. `imgui_touch_scroll.cpp`: the swipe, the tap, the hold, the long press. Its top comment is the design.
 5. `imgui_touch_pinch.cpp`, `imgui_touch_keyboard.cpp`.
 6. `tests/`: headless tests through the null backend. `tests/test_engine/`: the gestures driven by the Test Engine, headless or in a window.
 
-## The wheel session
-
-### What it does
-
-- Without it: a page scrolled with the wheel stops when a plot passes under the mouse, and the plot zooms. On the frame of the arrival, both happen ([#9587](https://github.com/ocornut/imgui/pull/9587) fixes that part).
-- With it, as in a browser: a wheel gesture that starts on the page keeps scrolling the page, and the plot sees no wheel. A gesture that starts on the plot zooms the plot.
-- A session ends when the mouse moves past the drag threshold, or after Dear ImGui's lock time (`WINDOWS_MOUSE_WHEEL_SCROLL_LOCK_TIMER`).
-- Widgets claim the wheel with Dear ImGui's own idiom: `if (ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY)) ...`.
-
-### How
-
-- `NewFramePre`: notes the item that owned the wheel (`GetKeyOwnerData(ImGuiKey_MouseWheelY)->OwnerNext`), since `NewFrame()` gives the wheel back to the window Dear ImGui keeps scrolling.
-- `NewFramePost`: when the session is the page's, the page scrolls (or Dear ImGui already scrolled it), and `io.MouseWheel` is set to 0, so that no widget sees it.
-- It reads `g.WheelingWindow`, `g.WheelingWindowScrolledFrame`, `g.HoveredWindow`, `g.HoveredIdPreviousFrame`.
-
-### In Dear ImGui
-
-It would not stay an extension: a few lines in `UpdateMouseWheel()`, next to the window lock it extends, behind a setting such as `io.ConfigWindowsWheelSession`.
-
-It does not replace [#9587](https://github.com/ocornut/imgui/pull/9587):
-- *#9587* is the minimal fix of a bug: on the frame a wheel lock starts, nobody owns the wheel, so one notch scrolls the window and zooms the item. Two lines, for every app, with no new behavior.
-- *The wheel session* goes one step further: the browser's behavior, opt-in. It needs a design discussion (a setting, its name, its default).
-
 ## Tests
 
-Two kinds, for both parts. All of them run headless, through Dear ImGui's null backend, in the kit's CI (Linux, macOS, Windows).
+Two kinds. All of them run headless, through Dear ImGui's null backend, in the CI (Linux, macOS, Windows).
 
 ### Unit tests: `tests/`
 
-- 39 tests for the swipe, the long press and the pinch (`test_touch_scroll.cpp`), 4 for the setup and the hooks (`test_touch_setup.cpp`), 10 for the wheel session (`test_wheel_session.cpp`).
-- They call the layer's steps frame by frame, with events queued by hand (positions, buttons, fingers): each one checks one rule. For example: "a long press on a slider, with a touch source, does not move it", "a flick that reaches the end overshoots, then springs back to the end", "an item whose ownership comes one frame late keeps the wheel when nothing scrolls (fast frames)".
+- 47 tests for the swipe, the long press and the pinch (`test_touch_scroll.cpp`), 5 for the setup and the hooks (`test_touch_setup.cpp`).
+- They call the layer's steps frame by frame, with events queued by hand (positions, buttons, fingers): each one checks one rule. For example: "a long press on a slider, with a touch source, does not move it", "a flick that reaches the end overshoots, then springs back to the end".
 - Run: `cmake -B build && cmake --build build && ctest --test-dir build`.
 
 ### Gestures driven by the Test Engine: `tests/test_engine/`
@@ -172,15 +134,13 @@ The same features, driven as a user would, by [Dear ImGui's Test Engine](https:/
 | touch | `mouse_drag_does_not_scroll` | the same drag with a mouse moves nothing (the swipe is for fingers) |
 | touch | `pinch_on_a_widget_zooms_it` | two fingers that spread on an item with the wheel adapter zoom it, by wheel notches; the font does not scale |
 | touch | `pinch_data_zooms_and_pans_at_once` | two fingers that spread and move on an item that reads the gesture (`ItemPinch()`) zoom it and pan it in the same gesture; the font does not scale, nothing is clicked |
-| wheel | `session_keeps_the_page` | a page scrolled with the wheel keeps scrolling over a zoomable item, which does not zoom; once the session ended, a wheel that starts on the item zooms it |
-| demo | `touch_cards_swipe_sideways` | in the kit's demo, a sideways swipe scrolls the row of cards (a child in a child) |
+| demo | `touch_cards_swipe_sideways` | in the demo, a sideways swipe scrolls the row of cards (a child in a child) |
 | demo | `touch_row_slider_takes_sideways_drag` | in the same row, a sideways drag on its slider moves the slider, and the row does not scroll (`SetItemTakesDrags(ImGuiTouchAxis_X)`) |
 
 - *A finger*: the Test Engine has no API for the mouse source, but none is needed. `io.AddMouseSourceEvent()` sets a state, which the next mouse events take, those the Test Engine queues included. The tests set it to `ImGuiMouseSource_TouchScreen` before each gesture.
-- *What each test proves*: without the kit's setups, the swipe, long press, pinch, wheel and demo tests fail. The three others pass either way: they check that the layer keeps what already worked (a tap still clicks, a hold hands the press to the slider, a mouse drag does not scroll).
+- *What each test proves*: without `ImGuiTouch::Setup()`, the swipe, long press, pinch and demo tests fail. The three others pass either way: they check that the layer keeps what already worked (a tap still clicks, a hold hands the press to the slider, a mouse drag does not scroll).
 - *Two programs run them*:
-  - `imgui_kit_te_tests`: headless, at full speed (under a second); `ctest` and the CI run it. An argument filters the tests, e.g. `touch`.
-  - `imgui_kit_te_tests_visible`: in a window (GLFW + OpenGL3), with the Test Engine's UI, to pick a test and watch it at the chosen speed. `--auto` plays all of them (about 20 s), then exits.
-- *Build*: `-DIMGUI_KIT_BUILD_TEST_ENGINE_TESTS=ON` fetches the Test Engine. It has its own license (free for open source projects), distinct from the kit's MIT license: the kit uses it for these tests only.
-- *The hook order*: the kit is set up before `ImGuiTestEngine_Start()`. The engine draws each test's GUI from its own `NewFramePost` hook, and hooks run in the order they were added: set up after it, the kit's wheel session would see the wheel only after the test's widgets.
-
+  - `imgui_touch_te_tests`: headless, at full speed (under a second); `ctest` and the CI run it. An argument filters the tests, e.g. `touch`.
+  - `imgui_touch_te_tests_visible`: in a window (GLFW + OpenGL3), with the Test Engine's UI, to pick a test and watch it at the chosen speed. `--auto` plays all of them (about 20 s), then exits.
+- *Build*: `-DIMGUI_TOUCH_BUILD_TEST_ENGINE_TESTS=ON` fetches the Test Engine. It has its own license (free for open source projects), distinct from imgui_touch's MIT license: it is used for these tests only.
+- *The hook order*: `ImGuiTouch::Setup()` goes before `ImGuiTestEngine_Start()`. The engine draws each test's GUI from its own `NewFramePost` hook, and hooks run in the order they were added: set up after it, the layer would see a press only after the test's widgets.
