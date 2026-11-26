@@ -136,7 +136,7 @@ Combined with the Test Engine, `ImGuiTouch::Setup()` goes before `ImGuiTestEngin
 ## In Dear ImGui
 
 - An answer to [ocornut/imgui#3379](https://github.com/ocornut/imgui/issues/3379) (drag to scroll).
-- Notes for a possible integration: [docs/dear_imgui_integration.md](docs/dear_imgui_integration.md).
+- How the layer works inside: [docs/dear_imgui_integration.md](docs/dear_imgui_integration.md).
 
 ## License
 

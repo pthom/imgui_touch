@@ -1,10 +1,12 @@
-# imgui_touch and Dear ImGui: notes for a possible integration
+# How imgui_touch works inside
 
 By Pascal Thomet, 2026.
 
 ----
 
 imgui_touch is a touch layer for Dear ImGui: it handles touch and multitouch interactions on a touch screen, and the phone's keyboard. It was added first in Dear ImGui Bundle v1.93. See [ocornut/imgui#3379](https://github.com/ocornut/imgui/issues/3379).
+
+These notes are for a reader of the code: how the layer works on a stock Dear ImGui, what it reads from its internals, and what Dear ImGui could offer to make it simpler.
 
 It started inside [imgui_kit](https://github.com/pthom/imgui_kit), a set of small utilities for Dear ImGui (widgets, layout, em units, a wheel session). It is now a library of its own: touch only.
 
